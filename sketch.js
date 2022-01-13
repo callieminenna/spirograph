@@ -1,9 +1,9 @@
 let R, r, rr, currentPoint; // point positions
 let hue;
-let center = 300;
+let center = 400;
 
 function setup() {
-    createCanvas(600, 600);
+    createCanvas(800, 800);
     background(255);
     colorMode(HSB);
     R = int(random(100, 200));
@@ -26,7 +26,7 @@ function draw() {
     ];
     stroke(hue, 255, 80);
     hue += 1;
-    if (hue > 255) hue = 0;
+    if (hue > 360) hue = 0;
     line(currentPoint[0], currentPoint[1], nextPoint[0], nextPoint[1]);
     currentPoint = nextPoint;
 }
