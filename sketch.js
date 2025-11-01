@@ -1,73 +1,92 @@
-let hue = 0, i = 0;
-let currentPoint, nextPoint;
+// Animation state
+let hue = 0; // Current color hue for rainbow effect (0-360)
+let angle = 0; // Current angle parameter for spirograph calculation
+let currentPoint, nextPoint; // Line endpoints for drawing spirograph segments
 
-var w = window.innerWidth;
-var h = window.innerHeight;  
+// Canvas dimensions
+let canvasWidth = window.innerWidth;
+let canvasHeight = window.innerHeight;
 
-// Sliders defaults
-let R = 224; // R: base radius
-let r = 28; // r: second radius
-let p = 93; // p: length of the pen
-let slider_R, slider_r, slider_p;
+// Spirograph parameters (defaults)
+let outerRadius = 224; // Radius of the fixed outer circle
+let innerRadius = 28; // Radius of the rolling inner circle
+let penDistance = 93; // Distance from inner circle center to pen point
+let slider_outerRadius, slider_innerRadius, slider_penDistance;
 
 function setup() {
-  canvas = createCanvas(w, h);
+  canvas = createCanvas(canvasWidth, canvasHeight);
   background(255);
   colorMode(HSB);
-  slider_R = createSlider(10, 400, R)
-    .position(10, 5)
-    .style("width", "400px");
-  slider_r = createSlider(10, 400, r)
-    .position(10, 25)
-    .style("width", "400px");
-  slider_p = createSlider(10, 200, p)
-    .position(10, 45)
-    .style("width", "400px");
 
+  // Create control sliders for spirograph parameters
+  slider_outerRadius = createSlider(10, 400, outerRadius)
+  .position(10, 5)
+  .style("width", "400px");
+  slider_innerRadius = createSlider(10, 400, innerRadius)
+  .position(10, 25)
+  .style("width", "400px");
+  slider_penDistance = createSlider(10, 200, penDistance)
+  .position(10, 45)
+  .style("width", "400px");
+
+  // Calculate initial pen position using parametric spirograph equations
   currentPoint = [
-    w/2 + (R - r) * cos(i) + p * cos(i * (1 - r / R)),
-    h/2 + (R - r) * sin(i) - p * sin(i * (1 - r / R)),
+    canvasWidth/2 + (outerRadius - innerRadius) * cos(angle) + penDistance * cos(angle * (1 - innerRadius / outerRadius)),
+    canvasHeight/2 + (outerRadius - innerRadius) * sin(angle) - penDistance * sin(angle * (1 - innerRadius / outerRadius)),
   ];
   nextPoint = null;
 }
 
 function draw() {
-  //////////////////////// The sliders
+  // Update slider UI area
   fill(255);
   noStroke();
-  rect(0, 0, 450, 90);
-  R = slider_R.value();
-  r = slider_r.value();
-  p = slider_p.value();
+  rect(0, 0, 450, 90); // White background for sliders
+
+  // Read slider values
+  outerRadius = slider_outerRadius.value();
+  innerRadius = slider_innerRadius.value();
+  penDistance = slider_penDistance.value();
+
+  // Display current slider values
   textSize(15);
   fill(0);
-  text(R, 420, 20);
-  text(r, 420, 40);
-  text(p, 420, 60);
+  text(outerRadius, 420, 20);
+  text(innerRadius, 420, 40);
+  text(penDistance, 420, 60);
 
-  //////////////////////// The spirograph
+  // Draw spirograph curve
   noFill();
   strokeWeight(2);
 
-  i += PI / 20;
+  // Increment angle for next point calculation
+  angle += PI / 20;
+
+  // Calculate next pen position using parametric spirograph equations
+  // x = (R - r) * cos(t) + p * cos(t * (1 - r/R))
+  // y = (R - r) * sin(t) - p * sin(t * (1 - r/R))
   nextPoint = [
-    w/2 + (R - r) * cos(i) + p * cos(i * (1 - r / R)),
-    h/2 + (R - r) * sin(i) - p * sin(i * (1 - r / R)),
+    canvasWidth/2 + (outerRadius - innerRadius) * cos(angle) + penDistance * cos(angle * (1 - innerRadius / outerRadius)),
+    canvasHeight/2 + (outerRadius - innerRadius) * sin(angle) - penDistance * sin(angle * (1 - innerRadius / outerRadius)),
   ];
+
+  // Draw line segment with cycling rainbow color
   stroke(hue, 255, 80);
   hue += 1;
   if (hue >= 360) hue = 0;
+
   line(currentPoint[0], currentPoint[1], nextPoint[0], nextPoint[1]);
   currentPoint = nextPoint;
 }
 
+// Clear canvas on mouse release
 function mouseReleased() {
   background(255);
 }
 
+// Handle window resize
 window.onresize = function () {
-  w = window.innerWidth;
-  h = window.innerHeight;
-  canvas.size(w, h);
+  canvasWidth = window.innerWidth;
+  canvasHeight = window.innerHeight;
+  canvas.size(canvasWidth, canvasHeight);
 };
-
